@@ -21,11 +21,10 @@ class SectorController extends Controller
         ]);
 
         if($validator->fails()){
-            $this->error('Invalid data', 422, $validator->errors(), $request->all());
+            return $this->error('Invalid data', 422, $validator->errors(), $request->all());
         }
 
         $event = Event::find($request->get('event_id'));
-        //var_dump($event);die;
 
         if(!$event){
             return $this->error('Event not found', 404, [], $request->all());

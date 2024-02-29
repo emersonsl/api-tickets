@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BatchController;
+use App\Http\Controllers\Api\V1\CouponController;
 use App\Http\Controllers\Api\V1\TestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\UserController;
@@ -41,6 +42,9 @@ Route::prefix('v1')->group(function(){
     });
     Route::prefix('batch')->group(function(){
         Route::post('/create', [BatchController::class, 'create'])->middleware(['auth:sanctum', 'can:create batch']);
+    });
+    Route::prefix('coupon')->group(function(){
+        Route::post('/create', [CouponController::class, 'create'])->middleware(['auth:sanctum', 'can:create coupon']);
     });
 });
 
