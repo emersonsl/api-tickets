@@ -24,8 +24,8 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'cpf_cnpj' => fake()->randomNumber(14),
-            'phone_number' => fake()->randomNumber(13),
+            'cpf_cnpj' => fake()->numberBetween(11111111111111, 99999999999999),
+            'phone_number' => fake()->numberBetween(1111111111111, 9999999999999),
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
