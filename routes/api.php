@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BatchController;
 use App\Http\Controllers\Api\V1\TestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\SectorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +35,12 @@ Route::prefix('v1')->group(function(){
     });
     Route::prefix('event')->group(function(){
         Route::post('/create', [EventController::class, 'create'])->middleware(['auth:sanctum', 'can:create event']);
+    });
+    Route::prefix('sector')->group(function(){
+        Route::post('/create', [SectorController::class, 'create'])->middleware(['auth:sanctum', 'can:create sector']);
+    });
+    Route::prefix('batch')->group(function(){
+        Route::post('/create', [BatchController::class, 'create'])->middleware(['auth:sanctum', 'can:create batch']);
     });
 });
 
