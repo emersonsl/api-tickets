@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\TestController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\EventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +30,9 @@ Route::prefix('v1')->group(function(){
     Route::prefix('auth')->group(function(){
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:sanctum']);
+    });
+    Route::prefix('event')->group(function(){
+        Route::post('/create', [EventController::class, 'create'])->middleware(['auth:sanctum', 'can:create event']);
     });
 });
 

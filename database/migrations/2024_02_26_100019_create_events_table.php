@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreign('create_by')->references('id')->on('users');
             $table->string('title');
             $table->dateTime('date_time');
-            $table->string('banner_url');
+            $table->string('banner_url')->nullable();
             $table->timestamps();
         });
     }
