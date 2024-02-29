@@ -30,4 +30,10 @@ class AuthController extends Controller
         }
         return $this->error('Unauthorized', 403);
     }
+
+    public function logout(Request $request){
+        $request->user()->currentAccessToken()->delete();
+
+        return $this->success('Logout success', 200);
+    }
 }
