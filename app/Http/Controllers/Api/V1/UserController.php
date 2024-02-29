@@ -33,6 +33,10 @@ class UserController extends Controller
         }
 
         try{
+            $user = User::where('email', $request->get('email'));
+            if($user){
+                return $this->error('Email already exists in the database', 409, [], $request->all()); 
+            }
             $user = User::create($validator->validated());
             $user->assignRole('customer');
             
