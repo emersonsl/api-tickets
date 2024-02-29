@@ -33,7 +33,9 @@ class UserController extends Controller
         }
 
         try{
-            User::create($validator->validated());
+            $user = User::create($validator->validated());
+            $user->assignRole('customer');
+            
             return $this->success('Success in register user', 200, $validator->validated());
         }catch(Exception $e){
             return $this->error('Fails in db store', 500, ['exception' => $e->getMessage()]); 
@@ -55,9 +57,8 @@ class UserController extends Controller
             $errors[] = 'User not found'; 
         }
 
-        try{
-            $role = Role::findByName($request->get('role'));
-        }catch (Exception $ex){
+        $role = Role::where('name', $request->get('role'))->first();
+        if(!$role){
             $errors[] = 'Role not found';
         }
 

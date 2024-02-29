@@ -23,7 +23,7 @@ class PermissionsSeeder extends Seeder
         $role = Role::create(['name' => 'admin']);
         
         $permissions = [
-            'promote to administrator',
+            'promote users',
         ];
         $this->createAddPermissions($role, $permissions);
         return $role;
@@ -34,6 +34,16 @@ class PermissionsSeeder extends Seeder
         
         $permissions = [
             'create event',
+        ];
+        $this->createAddPermissions($role, $permissions);
+        return $role;
+    }
+
+    private function createCustomerPermissions(): Role{
+        $role = Role::create(['name' => 'customer']);
+        
+        $permissions = [
+            'buy ticket',
         ];
         $this->createAddPermissions($role, $permissions);
         return $role;
@@ -51,20 +61,29 @@ class PermissionsSeeder extends Seeder
 
         // create permissions
         $adminRole = $this->createAdminPermissions();
-        $PromoterRole = $this->createPromoterPermissions();
+        $promoterRole = $this->createPromoterPermissions();
+        $customerRole = $this->createCustomerPermissions();
 
         // create demo users
         $user = \App\Models\User::factory()->create([
             'name' => 'Example Admin User',
             'email' => 'admin@example.com',
+            'password' => 'admin123'
         ]);
         $user->assignRole($adminRole);
 
         $user = \App\Models\User::factory()->create([
             'name' => 'Example Promoter User',
             'email' => 'promoter@example.com',
+            'password' => 'promoter123'
         ]);
-        $user->assignRole($PromoterRole);
+        $user->assignRole($promoterRole);
+
+        $user = \App\Models\User::factory()->create([
+            'name' => 'Example Customer User',
+            'email' => 'customer@example.com',
+        ]);
+        $user->assignRole($customerRole);
     }
 
 
