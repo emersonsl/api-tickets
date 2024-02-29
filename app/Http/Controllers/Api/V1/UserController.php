@@ -7,9 +7,7 @@ use App\Models\User;
 use App\Traits\HttpResponses;
 use Exception;
 
-;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 
