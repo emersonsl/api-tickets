@@ -36,6 +36,7 @@ Route::prefix('v1')->group(function(){
     Route::prefix('event')->group(function(){
         Route::post('/create', [EventController::class, 'create'])->middleware(['auth:sanctum', 'can:create event']);
         Route::get('/upcoming', [EventController::class, 'listUpcoming']);
+        Route::get('/available', [EventController::class, 'listAvailable']);
     });
     Route::prefix('sector')->group(function(){
         Route::post('/create', [SectorController::class, 'create'])->middleware(['auth:sanctum', 'can:create sector']);

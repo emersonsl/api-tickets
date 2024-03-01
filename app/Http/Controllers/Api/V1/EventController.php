@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Address;
+use App\Models\Batch;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use Exception;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -62,12 +64,45 @@ class EventController extends Controller
     }
 
     public function listUpcoming(){
-        $data = Event::where('date_time', '>=', 'now()')->get();
+        $data = Event::join('addresses', 'addresses.id', '=', 'events.address_id')
+                ->where('date_time', '>=', 'now()')
+                ->get();
         
         if(!$data){
             $this->error('Events Upcoming not found', 404, []);
         }
 
         return $this->success('List of Events Upcoming', 200, ['events' => $data]);
+    }
+
+    public function listAvailable(){
+
+        $data = Event::selectRaw('*, row_number() over(partition by events.id order by batches.id)')
+        ->join('addresses', 'addresses.id', '=', 'events.address_id')
+        ->join('batches', 'events.id', '=', 'batches.event_id')
+        ->where('events.date_time', '>=', 'now()')
+        ->where('batches.expiration_date_time', '>=', 'now()')
+        ->where('batches.release_date_time', '<=', 'now()')
+        ->where('batches.quantity', '>', '0')
+        ->get();
+
+        if(!$data){
+            $this->error('Events available not found', 404, []);
+        }
+
+        $this->filterData($data);
+
+        return $this->success('List of available Upcoming', 200, ['events' => $data]);
+    }
+
+    private function filterData(&$data){
+        $newData = [];
+        foreach($data as $element){
+            if($element->row_number == 1){
+                unset($element->row_number);
+                $newData[] = $element;
+            }
+        }
+        $data = $newData;
     }
 }
