@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\SectorController;
 use App\Http\Controllers\Api\V1\TicketController;
+use App\Http\Controllers\Api\V1\WebHookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,10 +22,6 @@ use App\Http\Controllers\Api\V1\TicketController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 
 Route::prefix('v1')->group(function(){
     Route::prefix('users')->group(function(){
@@ -53,6 +50,9 @@ Route::prefix('v1')->group(function(){
     });
     Route::prefix('payment')->group(function(){
         Route::post('/create', [PaymentController::class, 'create'])->middleware(['auth:sanctum', 'can:create payment']);
+    });
+    Route::prefix('webhook')->group(function(){
+        Route::post('/', [WebHookController::class, 'create']);
     });
 });
 
