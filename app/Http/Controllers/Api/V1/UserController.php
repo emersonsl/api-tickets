@@ -41,8 +41,8 @@ class UserController extends Controller
             $user->assignRole('customer');
             
             return $this->success('Success in register user', 200, $validator->validated());
-        }catch(Exception $e){
-            return $this->error('Fails in db store', 500, ['exception' => $e->getMessage()]); 
+        }catch(Exception $ex){
+            return $this->error('Fails in db store', 500, ['exception' => $ex->getMessage()]); 
         }   
     }
 

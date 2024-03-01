@@ -47,6 +47,7 @@ class PermissionsSeeder extends Seeder
         
         $permissions = [
             'reserve ticket',
+            'create payment'
         ];
         $this->createAddPermissions($role, $permissions);
         return $role;

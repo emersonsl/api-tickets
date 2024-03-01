@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\TestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\SectorController;
 use App\Http\Controllers\Api\V1\TicketController;
 
@@ -49,6 +50,9 @@ Route::prefix('v1')->group(function(){
     });
     Route::prefix('ticket')->group(function(){
         Route::post('/reserve', [TicketController::class, 'create'])->middleware(['auth:sanctum', 'can:reserve ticket']);
+    });
+    Route::prefix('payment')->group(function(){
+        Route::post('/create', [PaymentController::class, 'create'])->middleware(['auth:sanctum', 'can:create payment']);
     });
 });
 
