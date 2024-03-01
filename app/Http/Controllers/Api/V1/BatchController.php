@@ -20,7 +20,7 @@ class BatchController extends Controller
             'event_id' => 'required|numeric',
             'sector_id' => 'required|numeric',
             'title' => 'required',
-            'quantity' => 'required',
+            'quantity' => 'required|numeric|min:1',
             'value' => 'required|numeric',
             'release_date_time' => 'required|date|after:' . date('Y-m-d H:m:s'),
             'expiration_date_time' => 'required|date|after:release_date_time'

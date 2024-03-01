@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('event_id');
             $table->foreign('event_id')->references('id')->on('events');
             $table->string('key');
-            $table->unsignedBigInteger('quantity');
+            $table->bigInteger('quantity');
             $table->unsignedFloat('value');
             $table->dateTime('release_date_time');
             $table->dateTime('expiration_date_time');

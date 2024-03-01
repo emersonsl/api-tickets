@@ -46,7 +46,7 @@ class PermissionsSeeder extends Seeder
         $role = Role::create(['name' => 'customer']);
         
         $permissions = [
-            'buy ticket',
+            'reserve ticket',
         ];
         $this->createAddPermissions($role, $permissions);
         return $role;
@@ -85,6 +85,7 @@ class PermissionsSeeder extends Seeder
         $user = \App\Models\User::factory()->create([
             'name' => 'Example Customer User',
             'email' => 'customer@example.com',
+            'password' => 'customer123'
         ]);
         $user->assignRole($customerRole);
     }

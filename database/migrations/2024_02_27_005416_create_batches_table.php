@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreign('event_id')->references('id')->on('events');
             $table->foreign('sector_id')->references('id')->on('sectors');
             $table->string('title');
-            $table->unsignedBigInteger('quantity');
+            $table->bigInteger('quantity');
             $table->unsignedFloat('value');
             $table->dateTime('release_date_time');
             $table->dateTime('expiration_date_time');

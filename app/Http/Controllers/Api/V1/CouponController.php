@@ -7,8 +7,10 @@ use App\Models\Coupon;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Traits\HttpResponses;
+use Brick\Math\BigInteger;
 use Exception;
 use Illuminate\Support\Facades\Validator;
+use Ramsey\Uuid\Type\Integer;
 
 class CouponController extends Controller
 {
@@ -18,7 +20,7 @@ class CouponController extends Controller
         $validator = Validator::make($request->all(), [
             'event_id' => 'required|numeric',
             'key' => 'required',
-            'quantity' => 'required|numeric',
+            'quantity' => 'required|numeric|min:1',
             'value' => 'required|numeric',
             'release_date_time' => 'required|date|after:' . date('Y-m-d H:m:s'),
             'expiration_date_time' => 'required|date|after:release_date_time'
@@ -41,5 +43,35 @@ class CouponController extends Controller
         }
         
         return $this->success('Sector created with success', 200, ['sector' => $coupon]);
+    }
+
+    public static function check(string $key, int $event_id, float $value_batch = null): array{
+        $coupon = Coupon::where('key', $key)->where('event_id', $event_id)->first();
+
+        if(!$coupon){
+            return ['success' => false, 'error' => 'Coupon not found'];
+        }
+
+        if($coupon->event_id != $event_id){
+            return ['success' => false, 'error' => 'Coupon cannot be applied, does not belong to this event'];
+        }
+
+        if(isset($value_batch) && $coupon->value > $value_batch){
+            return ['success' => false, 'error' => 'Coupon cannot be applied, exceeds the maximum allowable value'];
+        }
+
+        if(strtotime($coupon->release_date_time) > strtotime(date('Y-m-d H:s'))){
+            return ['success' => false, 'error' => 'Coupon cannot be applied, not realesed'];
+        }
+
+        if(strtotime($coupon->expiration_date_time) < strtotime(date('Y-m-d H:s'))){
+            return ['success' => false, 'error' => 'Coupon cannot be applied, expired'];
+        }
+
+        if($coupon->quantity < 1){
+            return ['success' => false, 'error' => 'Coupon cannot be applied, sold out'];
+        }
+        
+        return ['success' => true, 'coupon' => $coupon];
     }
 }
