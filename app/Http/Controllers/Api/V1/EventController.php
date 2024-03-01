@@ -60,4 +60,14 @@ class EventController extends Controller
 
         return $this->success('Event created with success', 200, ['event' => $event]);
     }
+
+    public function listUpcoming(){
+        $data = Event::where('date_time', '>=', 'now()')->get();
+        
+        if(!$data){
+            $this->error('Events Upcoming not found', 404, []);
+        }
+
+        return $this->success('List of Events Upcoming', 200, ['events' => $data]);
+    }
 }
