@@ -20,7 +20,7 @@ class WebHookFactory extends Factory
         return [
             'model_id' => Payment::all()->random()->id,
             'model' => 'Payment',
-            'data' => json_encode([fake()->words(5)])
+            'data' => json_encode([fake()->words(5)]),
         ];
     }
 }
