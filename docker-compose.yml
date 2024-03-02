@@ -1,15 +1,24 @@
 version: '3'
 services:
-  api-ingressos:
-    image: api-ingressos:latest
-    container_name: api-ingressos
+  api-tickets:
+    build:
+      context: .
+    image: api-tickets:latest
+    container_name: api-tickets
     ports:
-      - "${PHP_APACHE_HOST_PORT}:80"
-    volumes:
-      - .:${PHP_APACHE_VOL} 
+      - "${PHP_HOST_PORT}:8000"
+    depends_on:
+      db: 
+        condition: service_healthy
+    entrypoint:
+       ["/bin/bash", "-c" , 
+          "php artisan migrate:fresh --seed --seeder=PermissionsSeeder 
+        && php artisan migrate --seed   
+        && php artisan serve --host=0.0.0.0 --port=8000"]
+    
   db:
     image: postgres:${POSTGRES_VERSION}
-    container_name: postgres-ingressos
+    container_name: postgres-tickets
     ports:
       - "${DB_PORT}:5432"
     environment:
@@ -19,5 +28,10 @@ services:
       - POSTGRES_USER=${DB_USERNAME}
     volumes:
       - pgdata:${POSTGRES_VOL}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
 volumes:
   pgdata:

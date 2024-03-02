@@ -1,18 +1,15 @@
-FROM php:8.3.3RC1-apache
+FROM php:8.2
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-ENV SERVER_NAME=localhost
+RUN apt-get update -y && apt-get install -y openssl zip unzip git libpq-dev \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo pdo_pgsql pgsql \
+    && rm -rf /var/cache/apt/archives
 
-RUN echo 'ServerName ${SERVER_NAME}' >> /etc/apache2/apache2.conf
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+WORKDIR /app
+COPY . /app
+RUN composer install
 
-RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-RUN addgroup --gid 1000 emerson
-RUN useradd -u 1000 -g 1000 -Mr emerson
-
-USER emerson
+CMD php artisan serve --host=0.0.0.0 --port=8000 && php artisan migrate:fresh --seed
+EXPOSE 8000
