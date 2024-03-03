@@ -18,14 +18,15 @@ services:
     
   db:
     image: postgres:${POSTGRES_VERSION}
-    container_name: postgres-tickets
+    container_name: ${POSTGRES_CONTAINER_NAME}
     ports:
       - "${DB_PORT}:5432"
     environment:
-      - PGDATA=${PGDATA}
+      - POSTGRES_DATA=${PGDATA}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_DATABASE}
       - POSTGRES_USER=${DB_USERNAME}
+      - PGUSER=${DB_USERNAME}
     volumes:
       - pgdata:${POSTGRES_VOL}
     healthcheck:
