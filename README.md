@@ -37,7 +37,22 @@ docker compose up --build
 4. Acesse a coleção do postman e comece a explorar os recursos disponíveis.
 
 - https://www.postman.com/material-operator-40567745/workspace/shared/request/20894322-88030241-6419-4ab2-8f45-3fccdd2a9524
-
+5. Usuário padrões que podem ser usados para testes
+- Administrador
+```
+email: admin@example.com
+password: admin123
+```
+- Produtor
+```
+email: promoter@example.com
+password: promoter123
+```
+- Cliente
+```
+email: customer@example.com
+password: customer123
+```
 ## Autor
 
 Este projeto foi desenvolvido por Emerson S. Lima.
