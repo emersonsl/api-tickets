@@ -185,4 +185,17 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Class Aliases
+    |--------------------------------------------------------------------------
+    |
+    | This class create for storage global constants
+    |
+    */
+
+    'aliases' => [
+        'Constants' => App\Constants::class
+    ]
+
 ];
