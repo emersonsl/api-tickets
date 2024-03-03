@@ -18,7 +18,10 @@ class DatabaseSeeder extends Seeder
         \App\Models\Sector::factory(10)->create();
         \App\Models\Batch::factory(10)->create();
         \App\Models\Coupon::factory(10)->create();
-
+        \App\Models\Ticket::factory(10)->create();
+        \App\Models\Payment::factory(10)->create();
+        \App\Models\WebHook::factory(10)->create();
+        
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',

@@ -20,17 +20,17 @@ class PermissionsSeeder extends Seeder
     }
 
     private function createAdminPermissions(): Role{
-        $role = Role::create(['name' => 'admin']);
+        $adminRole = Role::create(['name' => 'admin']);
         
         $permissions = [
             'promote users',
         ];
-        $this->createAddPermissions($role, $permissions);
-        return $role;
+        $this->createAddPermissions($adminRole, $permissions);
+        return $adminRole;
     }
 
     private function createPromoterPermissions(): Role{
-        $role = Role::create(['name' => 'promoter']);
+        $promoteRole = Role::create(['name' => 'promoter']);
         
         $permissions = [
             'create event',
@@ -38,19 +38,19 @@ class PermissionsSeeder extends Seeder
             'create batch',
             'create coupon'
         ];
-        $this->createAddPermissions($role, $permissions);
-        return $role;
+        $this->createAddPermissions($promoteRole, $permissions);
+        return $promoteRole;
     }
 
     private function createCustomerPermissions(): Role{
-        $role = Role::create(['name' => 'customer']);
+        $customerRole = Role::create(['name' => 'customer']);
         
         $permissions = [
             'reserve ticket',
             'create payment'
         ];
-        $this->createAddPermissions($role, $permissions);
-        return $role;
+        $this->createAddPermissions($customerRole, $permissions);
+        return $customerRole;
     }
 
     /**
@@ -64,31 +64,31 @@ class PermissionsSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // create permissions
-        $adminRole = $this->createAdminPermissions();
-        $promoterRole = $this->createPromoterPermissions();
         $customerRole = $this->createCustomerPermissions();
+        $promoterRole = $this->createPromoterPermissions();
+        $adminRole = $this->createAdminPermissions();
 
         // create demo users
-        $user = \App\Models\User::factory()->create([
-            'name' => 'Example Admin User',
-            'email' => 'admin@example.com',
-            'password' => 'admin123'
-        ]);
-        $user->assignRole($adminRole);
-
-        $user = \App\Models\User::factory()->create([
-            'name' => 'Example Promoter User',
-            'email' => 'promoter@example.com',
-            'password' => 'promoter123'
-        ]);
-        $user->assignRole($promoterRole);
-
         $user = \App\Models\User::factory()->create([
             'name' => 'Example Customer User',
             'email' => 'customer@example.com',
             'password' => 'customer123'
         ]);
         $user->assignRole($customerRole);
+
+        $user = \App\Models\User::factory()->create([
+            'name' => 'Example Promoter User',
+            'email' => 'promoter@example.com',
+            'password' => 'promoter123'
+        ]);
+        $user->assignRole([$promoterRole, $customerRole]);
+        
+        $user = \App\Models\User::factory()->create([
+            'name' => 'Example Admin User',
+            'email' => 'admin@example.com',
+            'password' => 'admin123'
+        ]);
+        $user->assignRole([$adminRole, $promoterRole, $customerRole]);
     }
 
 

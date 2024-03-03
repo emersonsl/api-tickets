@@ -21,7 +21,7 @@ class PaymentFactory extends Factory
         return [
             'ticket_id' => $ticket->id,
             'amount' => $ticket->amount,
-            'status' => fake()->random_int(0, 1),
+            'status' => fake()->numberBetween(0, 1),
             'description' => 'Ref: ' . $ticket->id,
             'paid_at' => fake()->dateTime(),
             'hash' => fake()->word(),
