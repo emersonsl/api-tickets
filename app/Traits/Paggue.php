@@ -26,7 +26,7 @@ trait Paggue
         return $response->json();
     }
     
-    private function sendRequestPix(string $user_name, float $amount, int $external_id, string $description, string $token, string $company_id){
+    private function sendRequestPix(string $user_name, float $amount, string $external_id, string $description, string $token, string $company_id){
         $response = Http::withToken($token)->withHeaders([
             'X-Company-ID' => $company_id,
             'Signature' => PAGGUE_SIGNATURE

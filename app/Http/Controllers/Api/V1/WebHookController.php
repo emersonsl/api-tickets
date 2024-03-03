@@ -16,7 +16,7 @@ class WebHookController extends Controller
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
-            'external_id' => 'required|numeric|integer|min:1',
+            'external_id' => 'required',
         ]);
         $external_id = $request->get('external_id');
 

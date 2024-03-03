@@ -19,6 +19,7 @@ class PaymentFactory extends Factory
     {
         $ticket = Ticket::all()->random();
         return [
+            'id' => fake()->uuid(),
             'ticket_id' => $ticket->id,
             'amount' => $ticket->amount,
             'status' => fake()->numberBetween(0, 1),

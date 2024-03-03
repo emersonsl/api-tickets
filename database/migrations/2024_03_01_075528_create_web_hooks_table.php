@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('web_hooks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('model_id');
+            $table->uuid('model_id');
             $table->string('model');
             $table->json('data');
             $table->timestamps();
