@@ -18,10 +18,10 @@ class CouponController extends Controller
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
-            'event_id' => 'required|numeric',
+            'event_id' => 'required|numeric|integer|min:1',
             'key' => 'required',
-            'quantity' => 'required|numeric|min:1',
-            'value' => 'required|numeric',
+            'quantity' => 'required|numeric|integer|min:1',
+            'value' => 'required|numeric|integer|min:1',
             'release_date_time' => 'required|date|after:' . date('Y-m-d H:m:s'),
             'expiration_date_time' => 'required|date|after:release_date_time'
         ]);

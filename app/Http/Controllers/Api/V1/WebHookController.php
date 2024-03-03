@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Constants;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Payment;
@@ -15,7 +16,7 @@ class WebHookController extends Controller
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
-            'external_id' => 'required|numeric',
+            'external_id' => 'required|numeric|integer|min:1',
         ]);
         $external_id = $request->get('external_id');
 
@@ -28,8 +29,16 @@ class WebHookController extends Controller
             return $this->error('Payment not found', 404, [], $request->all());
         }
 
+        if($payment->hash != $request->get('hash')){
+            return $this->error('Inconsistent hash', 422, [], $request->all()); 
+        }
+
+        $requestAmount = $request->get('amount');
+        $paymentAmount = $payment->amount;
+        $status = $this->getPaymentStatus($paymentAmount, $requestAmount);
+
         $payment->update([
-            'status' => $request->get('status'),
+            'status' => $status,
             'paid_at' => $request->get('paid_at'),
         ]);
         WebHook::create([
@@ -39,5 +48,15 @@ class WebHookController extends Controller
         ]);
 
         return $this->success('Webhook created with success', 200, ['payment' => $payment]);
+    }
+
+    private function getPaymentStatus(int $paymentAmount, int $requestAmount): int{
+        if($paymentAmount == $requestAmount){
+            return Constants::PAYMENT_STATUS_PAID;
+        }else if($paymentAmount > $requestAmount){
+            return Constants::PAYMENT_STATUS_PAID_LOWER;
+        }else{
+            return Constants::PAYMENT_STATUS_PAID_OVER;
+        }
     }
 }

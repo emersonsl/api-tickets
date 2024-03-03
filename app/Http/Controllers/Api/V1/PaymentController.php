@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Constants;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Ticket;
@@ -11,10 +12,6 @@ use App\Traits\Paggue;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-
-define('STATUS_NOT_PAID', 0);
-define('STATUS_PAID', 1);
 
 class PaymentController extends Controller
 {
@@ -23,7 +20,7 @@ class PaymentController extends Controller
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
-            'ticket_id' => 'required|numeric'
+            'ticket_id' => 'required|numeric|integer|min:1'
         ]);
 
         if($validator->fails()){
@@ -45,7 +42,7 @@ class PaymentController extends Controller
             $payment = Payment::create([
                 'ticket_id' => $ticket->id,
                 'amount' => $ticket->amount,
-                'status' => STATUS_NOT_PAID,
+                'status' => Constants::PAYMENT_STATUS_NOT_PAID,
                 'description' => 'Ref.: Ticket ' . $ticket->id,
             ]);
             $result = $this->createPix($ticket, $request->user(), $payment);

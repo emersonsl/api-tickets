@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ticket_id');
             $table->foreign('ticket_id')->references('id')->on('tickets');
-            $table->unsignedFloat('amount');
+            $table->unsignedBigInteger('amount');
             $table->integer('status');
             $table->string('description');
             $table->dateTime('paid_at')->nullable();

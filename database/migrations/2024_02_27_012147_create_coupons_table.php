@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('event_id')->references('id')->on('events');
             $table->string('key');
             $table->bigInteger('quantity');
-            $table->unsignedFloat('value');
+            $table->unsignedBigInteger('value');
             $table->dateTime('release_date_time');
             $table->dateTime('expiration_date_time');
             $table->unique(['key', 'event_id']);

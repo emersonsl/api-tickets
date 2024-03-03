@@ -23,7 +23,7 @@ class BatchFactory extends Factory
             'event_id' => Event::all()->random()->id,
             'sector_id' => Sector::all()->random()->id,
             'quantity' => fake()->numberBetween(0, 1000),
-            'value' => fake()->randomFloat(2, 0, 500),
+            'value' => fake()->numberBetween(0, 1000),
             'release_date_time' => fake()->dateTime(),
             'expiration_date_time' => fake()->dateTime(),
         ];

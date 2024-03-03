@@ -19,8 +19,8 @@ class TicketFactory extends Factory
      */
     public function definition(): array
     {
-        $value = fake()->randomFloat(2, 0, 500);
-        $value_discount = fake()->randomFloat(2, 0, $value);
+        $value = fake()->numberBetween(0, 1000);
+        $value_discount = fake()->fake()->numberBetween(0, $value);
         $amount = $value - $value_discount;
         $batch = Batch::all()->random();
         $coupon = Coupon::where('event_id', $batch->event_id)->first();

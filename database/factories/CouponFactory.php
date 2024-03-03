@@ -20,7 +20,7 @@ class CouponFactory extends Factory
         return [
             'key' => strtoupper(fake()->word()),
             'quantity' =>  fake()->numberBetween(0, 1000),
-            'value' => fake()->randomFloat(2, 0, 500),
+            'value' => fake()->numberBetween(0, 1000),
             'release_date_time' => fake()->dateTime(),
             'expiration_date_time' => fake()->dateTime(),
             'event_id' => Event::all()->random()->id,

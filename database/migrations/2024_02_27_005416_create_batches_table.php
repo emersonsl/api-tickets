@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreign('sector_id')->references('id')->on('sectors');
             $table->string('title');
             $table->bigInteger('quantity');
-            $table->unsignedFloat('value');
+            $table->unsignedBigInteger('value');
             $table->dateTime('release_date_time');
             $table->dateTime('expiration_date_time');
             $table->timestamps();

@@ -21,8 +21,8 @@ class UserController extends Controller
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
-            'phone_number' => 'required|numeric',
-            'cpf_cnpj' => 'required|numeric',
+            'phone_number' => 'required|numeric|integer|min:5',
+            'cpf_cnpj' => 'required|numeric|integer|min:9|max:14',
             'name' => 'required',
             'email' => 'required',
             'password' => 'required'

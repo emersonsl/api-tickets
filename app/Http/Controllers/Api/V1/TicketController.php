@@ -21,7 +21,7 @@ class TicketController extends Controller
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
-            'batch_id' => 'required|numeric',
+            'batch_id' => 'required|numeric|integer|min:1',
             'key_coupon' => 'nullable',
         ]);
 

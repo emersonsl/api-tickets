@@ -50,9 +50,7 @@ trait Paggue
         $token = $responseBodyAuth['access_token'];
         $company_id = $responseBodyAuth['user']['companies'][0]['id'];
 
-        $amount = intval($ticket->amount * 100);
-
-        $responseBodyCreatePix = $this->sendRequestPix($user->name, $amount, $payment->id, $payment->description, $token, $company_id);
+        $responseBodyCreatePix = $this->sendRequestPix($user->name, $ticket->amount, $payment->id, $payment->description, $token, $company_id);
 
         if(isset($responseBodyCreatePix['error']) && $responseBodyCreatePix['error']){
             return ['success' => false, 'error' => 'Error in connect API payment: ' . $responseBodyCreatePix['message'][0]['error'][0]];

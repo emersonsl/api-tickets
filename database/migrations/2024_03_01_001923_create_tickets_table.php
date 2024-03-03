@@ -19,9 +19,9 @@ return new class extends Migration
             $table->foreign('batch_id')->references('id')->on('batches');
             $table->unsignedBigInteger('coupon_id')->nullable();
             $table->foreign('coupon_id')->references('id')->on('coupons');
-            $table->unsignedFloat('value');
-            $table->unsignedFloat('value_discount');
-            $table->unsignedFloat('amount');
+            $table->unsignedBigInteger('value');
+            $table->unsignedBigInteger('value_discount');
+            $table->unsignedBigInteger('amount');
             $table->timestamps();
         });
     }

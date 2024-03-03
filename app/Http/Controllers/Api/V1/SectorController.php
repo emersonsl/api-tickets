@@ -16,7 +16,7 @@ class SectorController extends Controller
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
-            'event_id' => 'required|numeric',
+            'event_id' => 'required|numeric|integer|min:1',
             'title' => 'required'
         ]);
 

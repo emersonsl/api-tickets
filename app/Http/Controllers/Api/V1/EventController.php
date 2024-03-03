@@ -24,7 +24,7 @@ class EventController extends Controller
         $validatorAddress = Validator::make($request->get('address'), [
             'street' => 'required',
             'district' => 'required',
-            'number' => 'required|numeric',
+            'number' => 'required|numeric|integer|min:1',
             'city' => 'required',
             'state' => 'required',
             'country' => 'required',
