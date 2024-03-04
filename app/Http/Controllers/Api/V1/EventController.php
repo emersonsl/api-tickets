@@ -77,9 +77,10 @@ class EventController extends Controller
 
     public function listAvailable(){
 
-        $data = Event::selectRaw('*, row_number() over(partition by events.id order by batches.id)')
+        $data = Event::selectRaw('*, batches.title as batch_title, row_number() over(partition by events.id, sectors.id order by batches.id)')
         ->join('addresses', 'addresses.id', '=', 'events.address_id')
         ->join('batches', 'events.id', '=', 'batches.event_id')
+        ->join('sectors', 'sectors.id', '=', 'batches.sector_id')
         ->where('events.date_time', '>=', 'now()')
         ->where('batches.expiration_date_time', '>=', 'now()')
         ->where('batches.release_date_time', '<=', 'now()')
@@ -92,7 +93,7 @@ class EventController extends Controller
 
         $this->filterData($data);
 
-        return $this->success('List of available Upcoming', 200, ['events' => $data]);
+        return $this->success('List of Events Available', 200, ['events' => $data]);
     }
 
     private function filterData(&$data){
