@@ -26,4 +26,7 @@ app/storage/
 public_html/storage
 public_html/hot
 
+# Tests coverage Reports
+tests/Reports
+
 /.vagrant
