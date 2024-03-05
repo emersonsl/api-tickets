@@ -18,7 +18,7 @@ class AuthControllerTest extends TestCase
     use HttpResponses;
     
     /**
-     * Test login invalide fields
+     * Test login invalid fields
      */
     public function test_login_invalid_data(): void
     {
