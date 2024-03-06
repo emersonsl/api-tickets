@@ -11,6 +11,7 @@ RUN pecl install xdebug \
     && docker-php-ext-enable xdebug \
     && echo "xdebug.start_with_request=yes" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.discover_client_host=0" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.mode=coverage,develop" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.client_host=host.docker.internal" | tee -a /usr/local/etc/php/conf.d/xdebug.ini 
     
 # Install composer
