@@ -42,7 +42,7 @@ class CouponController extends Controller
             return $this->error('Fails in db store', 500, ['exception' => $ex->getMessage()], $request->all());
         }
         
-        return $this->success('Sector created with success', 200, ['sector' => $coupon]);
+        return $this->success('Coupon created with success', 200, ['sector' => $coupon]);
     }
 
     public static function check(string $key, int $event_id, float $value_batch = null): array{
@@ -50,10 +50,6 @@ class CouponController extends Controller
 
         if(!$coupon){
             return ['success' => false, 'error' => 'Coupon not found'];
-        }
-
-        if($coupon->event_id != $event_id){
-            return ['success' => false, 'error' => 'Coupon cannot be applied, does not belong to this event'];
         }
 
         if(isset($value_batch) && $coupon->value > $value_batch){
