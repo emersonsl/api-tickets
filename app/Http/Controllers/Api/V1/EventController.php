@@ -21,6 +21,15 @@ class EventController extends Controller
      */
     public function create(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'address' => 'required',
+            'event' => 'required'
+        ]);
+
+        if($validator->fails()){
+            return $this->error('Invalid data', 422, $validator->errors());
+        }
+
         $validatorAddress = Validator::make($request->get('address'), [
             'street' => 'required',
             'district' => 'required',
@@ -67,10 +76,6 @@ class EventController extends Controller
         $data = Event::join('addresses', 'addresses.id', '=', 'events.address_id')
                 ->where('date_time', '>=', 'now()')
                 ->get();
-        
-        if(!$data){
-            $this->error('Events Upcoming not found', 404, []);
-        }
 
         return $this->success('List of Events Upcoming', 200, ['events' => $data]);
     }
@@ -86,10 +91,6 @@ class EventController extends Controller
         ->where('batches.release_date_time', '<=', 'now()')
         ->where('batches.quantity', '>', '0')
         ->get();
-
-        if(!$data){
-            $this->error('Events available not found', 404, []);
-        }
 
         $this->filterData($data);
 
