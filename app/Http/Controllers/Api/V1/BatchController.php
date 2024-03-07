@@ -27,7 +27,7 @@ class BatchController extends Controller
         ]);
         
         if($validator->fails()){
-            return $this->error('Invalid data', 422, $validator->errors());
+            return $this->error('Invalid data', 422, $validator->errors(), $request->all());
         }
         
         $event = Event::find($request->get('event_id'));

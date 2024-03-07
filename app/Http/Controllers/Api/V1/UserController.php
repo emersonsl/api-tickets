@@ -15,14 +15,10 @@ class UserController extends Controller
 {
     use HttpResponses;
 
-    public function index(){
-        return User::find(1);
-    }
-
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
             'phone_number' => 'required|numeric|integer|min:5',
-            'cpf_cnpj' => 'required|numeric|integer|min:9|max:14',
+            'cpf_cnpj' => 'required|numeric|integer|min_digits:9|max_digits:14',
             'name' => 'required',
             'email' => 'required',
             'password' => 'required'
@@ -33,7 +29,7 @@ class UserController extends Controller
         }
 
         try{
-            $user = User::where('email', $request->get('email'));
+            $user = User::where('email', $request->get('email'))->first();
             if($user){
                 return $this->error('Email already exists in the database', 409, [], $request->all()); 
             }

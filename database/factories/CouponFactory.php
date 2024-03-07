@@ -17,12 +17,15 @@ class CouponFactory extends Factory
      */
     public function definition(): array
     {
+        $release_date_time = fake()->dateTimeBetween('now', '+ 30 day');
+        $expiration_date_time = fake()->dateTimeBetween($release_date_time, '+ 30 day');
+
         return [
             'key' => strtoupper(fake()->word()),
             'quantity' =>  fake()->numberBetween(0, 1000),
             'value' => fake()->numberBetween(0, 1000),
-            'release_date_time' => fake()->dateTime(),
-            'expiration_date_time' => fake()->dateTime(),
+            'release_date_time' => $release_date_time,
+            'expiration_date_time' => $expiration_date_time,
             'event_id' => Event::all()->random()->id,
         ];
     }

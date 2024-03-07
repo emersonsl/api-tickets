@@ -19,6 +19,8 @@ services:
         && php artisan migrate:fresh --seed --seeder=PermissionsSeeder 
         && php artisan migrate --seed   
         && php artisan serve --host=0.0.0.0 --port=8000"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     
   db:
     image: postgres:${POSTGRES_VERSION}

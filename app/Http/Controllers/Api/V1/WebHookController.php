@@ -18,12 +18,13 @@ class WebHookController extends Controller
         $validator = Validator::make($request->all(), [
             'external_id' => 'required',
         ]);
-        $external_id = $request->get('external_id');
-
+        
         if($validator->fails()){
             return $this->error('Invalid data', 422, $validator->errors()); 
         }
-
+        
+        $external_id = $request->get('external_id');
+        
         $payment = Payment::find($external_id);
         if(!$payment){
             return $this->error('Payment not found', 404, [], $request->all());
