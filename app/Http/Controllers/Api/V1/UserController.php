@@ -15,10 +15,6 @@ class UserController extends Controller
 {
     use HttpResponses;
 
-    public function index(){
-        return User::find(1);
-    }
-
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
             'phone_number' => 'required|numeric|integer|min:5',
