@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Constants;
 use App\Http\Controllers\Controller;
+use App\Jobs\ProcessPayment;
 use App\Models\Payment;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Validator;
@@ -16,7 +17,6 @@ use Illuminate\Support\Facades\DB;
 class PaymentController extends Controller
 {
     use HttpResponses;
-    use Paggue;
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
@@ -42,26 +42,15 @@ class PaymentController extends Controller
             $payment = Payment::create([
                 'ticket_id' => $ticket->id,
                 'amount' => $ticket->amount,
-                'status' => Constants::PAYMENT_STATUS_NOT_PAID,
+                'status' => Constants::PAYMENT_STATUS_NOT_PROCESS,
                 'description' => 'Ref.: Ticket ' . $ticket->id,
             ]);
-            $result = $this->createPix($ticket, $request->user(), $payment);
+            
+            ProcessPayment::dispatch($payment, $request->user(), $ticket);
 
-            if(!$result['success']){
-                DB::rollBack();
-                return $this->error($result['error'], 500, [], $request->all());
-            }
-
-            $payment->update([
-                'hash' => $result['data']['hash'],
-                'paid_at' => $result['data']['paid_at'] ?: null,
-                'expiration_at' => $result['data']['expiration_at'] ?: null,
-                'payment' => $result['data']['payment'],
-                'status' => $result['data']['status'],
-                'reference_id' => $result['data']['reference']
-            ]);
             DB::commit();
         }catch(Exception $ex){
+            DB::rollBack();
             return $this->error('Fails in db store', 500, ['exception' => $ex->getMessage()]); 
         }
 

@@ -5,6 +5,7 @@ namespace App\Traits;
 use App\Models\Payment;
 use App\Models\Ticket;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Http;
 
 define('PAGGUE_CLIENT_KEY', env('PAGGUE_CLIENT_KEY'));
@@ -44,7 +45,8 @@ trait Paggue
         $responseBodyAuth = $this->authenticate();
 
         if(isset($responseBodyAuth['error']) && $responseBodyAuth['error']){
-            return ['success' => false, 'error' => 'Error in connect API payment: ' . $responseBodyAuth['message'][0]['error'][0]];
+            $message = 'Error in connect API payment: ' . $responseBodyAuth['message'][0]['error'][0];
+            throw new Exception($message);
         }
 
         $token = $responseBodyAuth['access_token'];
@@ -53,7 +55,8 @@ trait Paggue
         $responseBodyCreatePix = $this->sendRequestPix($user->name, $ticket->amount, $payment->id, $payment->description, $token, $company_id);
 
         if(isset($responseBodyCreatePix['error']) && $responseBodyCreatePix['error']){
-            return ['success' => false, 'error' => 'Error in connect API payment: ' . $responseBodyCreatePix['message'][0]['error'][0]];
+            $message = 'Error in connect API payment: ' . $responseBodyCreatePix['message'][0]['error'][0];
+            throw new Exception($message);
         }
 
         return ['success' => true, 'data' => $responseBodyCreatePix];

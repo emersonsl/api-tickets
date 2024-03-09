@@ -25,7 +25,6 @@ use App\Http\Controllers\Api\V1\WebHookController;
 
 Route::prefix('v1')->group(function(){
     Route::prefix('users')->group(function(){
-        Route::get('/', [UserController::class, 'index']);
         Route::post('/register', [UserController::class, 'create']);
         Route::put('/promote', [UserController::class, 'promote'])->middleware(['auth:sanctum', 'can:promote users']);
     });
@@ -57,5 +56,3 @@ Route::prefix('v1')->group(function(){
         Route::post('/', [WebHookController::class, 'create']);
     });
 });
-
-Route::get('/test', [TestController::class, 'index']);
