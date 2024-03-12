@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Http\Controllers\Api\V1\UserController;
 use App\Mail\PaymentProcessedMail;
+use App\Mail\PaymentProcessedAdminMail;
 use App\Models\Payment;
 use App\Models\Ticket;
 use App\Models\User;
@@ -49,5 +51,9 @@ class ProcessPayment implements ShouldQueue
         ]);
 
         Mail::to($this->user)->queue(new PaymentProcessedMail($this->payment, $this->user));
+        
+        $admin = UserController::getFirstAdmin();
+
+        Mail::to($admin)->queue(new PaymentProcessedAdminMail($this->payment, $this->user, $admin));
     }
 }

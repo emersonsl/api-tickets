@@ -70,4 +70,11 @@ class UserController extends Controller
         
         return $this->success('Success in promote user', 200, ['user' => $user, 'role' => $role, 'user' => $user]);
     }
+
+    public static function getFirstAdmin(): User{
+        $admin = User::join('model_has_roles', 'users.id', '=','model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->where('roles.name', '=','admin')->first();
+        return $admin;
+    }
 }
