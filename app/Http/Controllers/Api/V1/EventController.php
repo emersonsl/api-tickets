@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Address;
-use App\Models\Batch;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use Exception;
-use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -106,5 +104,30 @@ class EventController extends Controller
             }
         }
         $data = $newData;
+    }
+
+    public function uploadBanner(Request $request){
+        $validator = Validator::make($request->all(), [
+            'event_id' => 'required|numeric|integer|min:1',
+            'banner' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        if($validator->fails()){
+            return $this->error('Invalid data', 422, $validator->errors(), $request->all());
+        }
+
+        $event = Event::find($request->get('event_id'));
+
+        if(!$event){
+            return $this->error('Event not found', 404, [], $request->all());
+        }
+
+        $folder_path = "event/$event->id/banner";
+        $path = $request->file('banner')->store($folder_path);
+
+        $event->banner_url = $path;
+        $event->save();
+        
+        return $this->success('Banner upload with success', 200, ['event' => $event]);
     }
 }

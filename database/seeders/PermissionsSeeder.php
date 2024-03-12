@@ -34,9 +34,10 @@ class PermissionsSeeder extends Seeder
         
         $permissions = [
             'create event',
+            'upload banner event',
             'create sector',
             'create batch',
-            'create coupon'
+            'create coupon',
         ];
         $this->createAddPermissions($promoteRole, $permissions);
         return $promoteRole;

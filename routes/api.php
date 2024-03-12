@@ -34,6 +34,7 @@ Route::prefix('v1')->group(function(){
     });
     Route::prefix('event')->group(function(){
         Route::post('/create', [EventController::class, 'create'])->middleware(['auth:sanctum', 'can:create event']);
+        Route::post('/uploadbanner', [EventController::class, 'uploadBanner'])->middleware(['auth:sanctum', 'can:upload banner event']);
         Route::get('/upcoming', [EventController::class, 'listUpcoming']);
         Route::get('/available', [EventController::class, 'listAvailable']);
     });
