@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EventCreatedMail;
 use App\Models\Address;
 use App\Models\Event;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class EventController extends Controller
@@ -66,8 +69,22 @@ class EventController extends Controller
             DB::rollBack();
             return $this->error('Error in stored db', 500, ['exception' => $ex->getMessage()], [$request->all()]); 
         }
+        
+        $responseArray = ['event' => $event];
 
-        return $this->success('Event created with success', 200, ['event' => $event]);
+        try{
+            $this->sendMailToAdmin($event, $user);
+        }catch (Exception $ex){
+            $responseArray['message'] = $ex->getMessage();
+        }
+
+        return $this->success('Event created with success', 200, $responseArray);
+    }
+
+    private function sendMailToAdmin(Event $event, User $promoter): void {
+        $admin = UserController::getFirstAdmin();
+
+        Mail::to($admin)->queue(new EventCreatedMail($event, $promoter, $admin));
     }
 
     public function listUpcoming(){
