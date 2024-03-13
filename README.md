@@ -28,16 +28,31 @@ Este é um sistema de gestão de eventos desenvolvido para atender às necessida
 
 ## Como Configurar e Executar
 
-1. Clone este repositório em sua máquina local.
-2. Configure as variáveis de ambiente necessárias, incluindo credenciais de banco de dados e da api de pagamentos.
-3. Na pasta raiz do projeto, que contém o arquivo `docker-compose.yml`, execute os contêineres Docker com o comando abaixo.
+1. Clone este repositório em sua máquina local e abra a pasta do projeto.
+```
+git clone https://github.com/emersonsl/api-tickets.git
+```
+```
+cd api-tickets
+```
+2. Crie o arquivo de configuração baseado no exemplo do repositório
+```
+cp .env.example .env
+```
+3. Configure as variáveis de ambiente necessárias no arquivo .env
+ - credenciais do servidor de e-mail (os testes foram realizados utilizando o Amazon Simple Email Service)
+ - credenciais do servidor de arquivos (os testes foram realizados com o Amazon Simple Storage Service - S3)
+ - credenciais do banco de dados (as configurações do arquivo de exemplo já atenderão para o uso em ambiente local)
+ - credenciais da api de pagamentos
+5. Na pasta raiz do projeto, que contém o arquivo `docker-compose.yml`, execute os contêineres Docker com o comando abaixo.
 ```
 docker compose up --build
 ``` 
-4. Acesse a coleção do postman e comece a explorar os recursos disponíveis.
+6. Acesse a coleção do postman e comece a explorar os recursos disponíveis.
 
-- https://www.postman.com/material-operator-40567745/workspace/shared/request/20894322-88030241-6419-4ab2-8f45-3fccdd2a9524
-5. Usuários padrões que podem ser usados para testes
+[COLECTION POSTMAN] https://www.postman.com/material-operator-40567745/workspace/shared/request/20894322-88030241-6419-4ab2-8f45-3fccdd2a9524
+
+7. Usuários padrões que podem ser usados para testes
 - Administrador
 ```
 email: admin@example.com
@@ -53,6 +68,27 @@ password: promoter123
 email: customer@example.com
 password: customer123
 ```
+
+## Testes automatizados
+
+Após iniciar o docker, execute o comando abaixo
+
+```
+docker exec -it api-tickets php artisan test --coverage-html tests/Reports/coverage/
+``` 
+
+O relatório de testes ficará disponível na pasta 
+
+```
+tests/Reports/coverage/
+```
+
+# Aplicação em nuvem
+
+Para acessar a aplicação em nuvem utilize o endereço abaixo:
+
+[Api Tickets] http://52.200.145.207/
+
 ## Autor
 
 Este projeto foi desenvolvido por Emerson S. Lima.
