@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -125,4 +126,84 @@ class EventControllerTest extends TestCase
         $this->assertEquals('200', $responseArray['status']); 
         $this->assertEquals('List of Events Available', $responseArray['message']); 
     }
+
+    /**
+     * Test upload banner event invalid fields
+     */
+    public function test_upload_banner_invalid_data(): void
+    {
+        $response = $this->post('/api/v1/event/uploadbanner', [ 
+            'event_id' => 'invalid type'
+        ]);
+
+        $response->assertStatus(422);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('422', $responseArray['status']); 
+        $this->assertEquals('Invalid data', $responseArray['message']); 
+    }
+
+    private function createImageFile(): UploadedFile{
+        $filename = fake()->word . '.png';
+        $imageData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAHUAAAAcCAMAAABoIQAcAAAASFBMVEUAAABlK4VlK4VlKINjKoVlK4VkKoNkKYNlK4VgKoBlKIVkKoNkKoRlK4VwIIBlK4VjKYNkK4RjLYNmK4ZlKodlKoVmKoNlK4W/Nw0oAAAAF3RSTlMA378fYO+AQJ8QMJBwzxCvUM9Qr3+wgHDNfUAAAALnSURBVEjHrVXbtusgCAwGL1Fza7tP/v9PT4JQtK6ulYfOS1sKMwoCQ05xmLwLIbhtGt6IeJlS9oPi9EPntjgZiLVndqfby77op3duHATZ4TsW08mH/N9xHMEejCAB/hBAlrgx2bfViuyLbdcHeZ5f/iTCncapxJpW4mgALIuVLfCdbO2I5QJzbVuZz4jqev4YSRQ+JI4WRu5qwZxgBQ2E8jEXt1DuyZzxUzWJKpDbbixRiGryy7B44uBC8p0XRywsAH45TQjkJnVwy5WIJ/s1qsiqSLGUsCsWi+q/6mxpaOH245Djjlp0I/5c9slSDVWVjRRjNHakupPqJF6cuxbRlL+UzVKaClusTuxFVZCLmq1oV4ploZaux1izQaUqNteoqnWsbFIptSid9Fd2F3ybBj2cvFFlU1UFTuXE4BjzF1XuLwGgKInC9q6rvokJ6rqqpORJ8UWVa67IogB08mylm+gNv+Kp6WfORcNnYOQTNZi/qF5uNmU8Aec3Du2nybNhw05VWiI+XFBEeU2talRefTHNfImc16A2zrXyacf0OPgudcjjav4qUsrExbZu0bctusb3bWC41u0SkWT6apb80WevGknjgYhRd9BFuZBtqfmidpuVFLZ3dppNT+OKM2wkklUh9LlKgL3tXYA4E41oyNXiNskEn014Aj8THm+Qvcey3OSVuM2fiFM9ZwL6C+8jRV4IvCZQW8KaZzBg2Ra6LhmyGkS13mlybycG4sShM8pUb/nww89myXun+jgabNpNnQRUFgaKjdfafDV+2Gn/OS3dmAyleQ1ylNGZKtQy27rbio5jcTUA+5oXLfdSPC2sjubmTFL3sUS0rKAYaTiF2yTnfbb7kpp//LKU7uGm88Oh5iQX1ZE2EmP6raq24avekZsOTp0wv1bN1DFu84iZBuNI1ysNu2FpbPytar+tEiegXUQ/VZWVo3gusnKaRXQbCfab3hgMHNRyyYvNJ0MNC3vYlvui/wFklmFjtR8ItgAAAABJRU5ErkJggg==');
+        
+        $tempFilePath = sys_get_temp_dir() . '/' . $filename;
+        file_put_contents($tempFilePath, $imageData);
+        
+        $uploadedFile = new UploadedFile(
+            $tempFilePath, 
+            $filename,     
+            'image/png',  
+            null,          
+            true           
+        );
+        
+        return $uploadedFile;
+    }
+
+    /**
+     * Test upload banner event not found
+     */
+    public function test_upload_banner_event_not_found(): void
+    {
+        $maxId = Event::max('id');
+        
+        $data = [
+            'event_id' => $maxId + 1,
+            'banner' => $this->createImageFile()
+        ];
+
+        $response = $this->post('/api/v1/event/uploadbanner', $data);
+        $response->assertStatus(404);
+        
+        $responseArray = $response->getData(true);
+        
+        $this->assertEquals('404', $responseArray['status']); 
+        $this->assertEquals('Event not found', $responseArray['message']);
+    }
+
+    /**
+     * Test upload banner success
+     */
+    public function test_upload_banner_success(): void
+    {
+        $id = Event::all()->first()->id;
+
+        $data = [
+            'event_id' => $id,
+            'banner' => $this->createImageFile()
+        ];
+
+        $response = $this->post('/api/v1/event/uploadbanner', $data);
+        var_dump($response);
+        
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+        
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('Banner upload with success', $responseArray['message']);
+    }
+
 }
