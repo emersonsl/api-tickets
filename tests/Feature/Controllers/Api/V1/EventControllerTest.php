@@ -196,7 +196,6 @@ class EventControllerTest extends TestCase
         ];
 
         $response = $this->post('/api/v1/event/uploadbanner', $data);
-        var_dump($response);
         
         $response->assertStatus(200);
         
