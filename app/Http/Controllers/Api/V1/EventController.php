@@ -17,6 +17,19 @@ use Illuminate\Support\Facades\Validator;
 class EventController extends Controller
 {
     use HttpResponses;
+
+    public function index(Request $request){
+        $user = $request->user();
+
+        if($user->hasRole('admin')){
+            $data = Event::all();
+        }else{
+            $data = Event::where('create_by', $user->id)->get();
+        }
+
+        return $this->success('List of Events', 200, ['events' => $data]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

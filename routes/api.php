@@ -33,6 +33,7 @@ Route::prefix('v1')->group(function(){
         Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:sanctum']);
     });
     Route::prefix('event')->group(function(){
+        Route::get('/', [EventController::class, 'index'])->middleware(['auth:sanctum', 'can:list events']);
         Route::post('/create', [EventController::class, 'create'])->middleware(['auth:sanctum', 'can:create event']);
         Route::post('/uploadbanner', [EventController::class, 'uploadBanner'])->middleware(['auth:sanctum', 'can:upload banner event']);
         Route::get('/upcoming', [EventController::class, 'listUpcoming']);
