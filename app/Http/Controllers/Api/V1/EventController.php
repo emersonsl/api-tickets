@@ -104,7 +104,7 @@ class EventController extends Controller
 
     public function listAvailable(){
 
-        $data = Event::selectRaw('events.*, events.address_id, batches.id as batch_id, sectors.id as sector_id, row_number() over(partition by events.id, sectors.id order by batches.id)')
+        $data = Event::selectRaw('events.*, batches.id as batch_id, sectors.id as sector_id, row_number() over(partition by events.id, sectors.id order by batches.id)')
         ->join('batches', 'events.id', '=', 'batches.event_id')
         ->join('sectors', 'sectors.id', '=', 'batches.sector_id')
         ->where('events.date_time', '>=', 'now()')
