@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EventResource;
+use App\Http\Resources\EventResourceWithBatchWithSector;
 use App\Mail\EventCreatedMail;
 use App\Models\Address;
 use App\Models\Event;
@@ -18,15 +20,9 @@ class EventController extends Controller
 {
     use HttpResponses;
 
-    public function index(Request $request){
-        $user = $request->user();
-
-        if($user->hasRole('admin')){
-            $data = Event::all();
-        }else{
-            $data = Event::where('create_by', $user->id)->get();
-        }
-
+    public function index(){
+        $data = EventResource::collection(Event::all());
+        
         return $this->success('List of Events', 200, ['events' => $data]);
     }
 
@@ -101,17 +97,14 @@ class EventController extends Controller
     }
 
     public function listUpcoming(){
-        $data = Event::join('addresses', 'addresses.id', '=', 'events.address_id')
-                ->where('date_time', '>=', 'now()')
-                ->get();
+        $data = EventResource::collection(Event::where('date_time', '>=', 'now()')->get());
 
         return $this->success('List of Events Upcoming', 200, ['events' => $data]);
     }
 
     public function listAvailable(){
 
-        $data = Event::selectRaw('*, batches.title as batch_title, row_number() over(partition by events.id, sectors.id order by batches.id)')
-        ->join('addresses', 'addresses.id', '=', 'events.address_id')
+        $data = Event::selectRaw('events.*, events.address_id, batches.id as batch_id, sectors.id as sector_id, row_number() over(partition by events.id, sectors.id order by batches.id)')
         ->join('batches', 'events.id', '=', 'batches.event_id')
         ->join('sectors', 'sectors.id', '=', 'batches.sector_id')
         ->where('events.date_time', '>=', 'now()')
@@ -121,6 +114,8 @@ class EventController extends Controller
         ->get();
 
         $this->filterData($data);
+
+        $data = EventResourceWithBatchWithSector::collection($data);
 
         return $this->success('List of Events Available', 200, ['events' => $data]);
     }
