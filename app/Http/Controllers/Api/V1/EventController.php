@@ -26,21 +26,15 @@ class EventController extends Controller
         return $this->success('List of Events', 200, ['events' => $data]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
+    private function makeCreateValidator(Request &$request){
+        return Validator::make($request->all(), [
             'address' => 'required',
             'event' => 'required'
         ]);
+    }
 
-        if($validator->fails()){
-            return $this->error('Invalid data', 422, $validator->errors());
-        }
-
-        $validatorAddress = Validator::make($request->get('address'), [
+    private function makeCreateValidatorAddress(Request &$request){
+        return Validator::make($request->get('address'), [
             'street' => 'required',
             'district' => 'required',
             'number' => 'required|numeric|integer|min:1',
@@ -50,11 +44,47 @@ class EventController extends Controller
             'post_code' => 'required',
             'complement' => 'nullable'
         ]);
+    }
 
-        $validatorEvent = Validator::make($request->get('event'), [
+    private function makeCreateValidatorEvent(Request &$request){
+        return Validator::make($request->get('event'), [
             'title' => 'required',
-            'date_time' => 'required|date|after:' . date('Y-m-d H:m:s')
+            'date_time' => 'required|date|after:' . date('Y-m-d H:m:s'),
+            'banner' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+    }
+
+    private function storeEvent(Array $eventData, Array $addressData, User $user){
+        try{
+            DB::beginTransaction();
+            $address = Address::create($addressData);
+            
+            $eventData['address_id'] = $address->id;
+            $eventData['create_by'] = $user->id;
+
+            $event = Event::create($eventData);
+            DB::commit();
+        }catch(Exception $ex){
+            DB::rollBack();
+            return ['success' => false, 'message' => $ex->getMessage()];
+        }
+
+        return ['success' => true, 'data' => $event];
+    }
+    
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(Request $request)
+    {
+        $validator = $this->makeCreateValidator($request);
+
+        if($validator->fails()){
+            return $this->error('Invalid data', 422, $validator->errors());
+        }
+
+        $validatorAddress = $this->makeCreateValidatorAddress($request);
+        $validatorEvent = $this->makeCreateValidatorEvent($request);
 
         if($validatorAddress->fails() || $validatorEvent->fails()){
             return $this->error('Invalid data', 422, [
@@ -62,23 +92,20 @@ class EventController extends Controller
                 'event' => $validatorEvent->errors()
             ]); 
         }
-        try{
-            DB::beginTransaction();
-            $address = Address::create($validatorAddress->validated());
-            $user = $request->user();
-            
-            $eventData = [
-                'address_id' => $address->id,
-                'create_by' => $user->id,
-            ];
-            $eventData = array_merge($eventData, $validatorEvent->validated());
-            $event = Event::create($eventData);
-            DB::commit();
-        }catch(Exception $ex){
-            DB::rollBack();
-            return $this->error('Error in stored db', 500, ['exception' => $ex->getMessage()], [$request->all()]); 
+
+        $user = $request->user();
+
+        $resultStoreEvent = $this-> storeEvent(
+            $validatorEvent->validated(),
+            $validatorAddress->validated(),
+            $user
+        );
+
+        if(!$resultStoreEvent['success']){
+            return $this->error('Error in stored db', 500, ['exception' => $resultStoreEvent['message']], [$request->all()]); 
         }
         
+        $event = $resultStoreEvent['data'];
         $responseArray = ['event' => $event];
 
         try{
