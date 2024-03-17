@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Event extends Model
+class AuditLog extends Model
 {
-    use HasFactory, Auditable;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -16,9 +15,10 @@ class Event extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'address_id',
-        'create_by',
-        'title',
-        'date_time'
+        'model_type',
+        'model_id',
+        'user_id',
+        'event',
+        'data'
     ];
 }
