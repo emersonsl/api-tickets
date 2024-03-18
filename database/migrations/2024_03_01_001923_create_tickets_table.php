@@ -14,15 +14,16 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict');
             $table->unsignedBigInteger('batch_id');
-            $table->foreign('batch_id')->references('id')->on('batches');
+            $table->foreign('batch_id')->references('id')->on('batches')->onDelete('restrict');
             $table->unsignedBigInteger('coupon_id')->nullable();
-            $table->foreign('coupon_id')->references('id')->on('coupons');
+            $table->foreign('coupon_id')->references('id')->on('coupons')->onDelete('restrict');
             $table->unsignedBigInteger('value');
             $table->unsignedBigInteger('value_discount');
             $table->unsignedBigInteger('amount');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

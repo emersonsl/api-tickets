@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('coupons', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('event_id');
-            $table->foreign('event_id')->references('id')->on('events');
+            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
             $table->string('key');
             $table->bigInteger('quantity');
             $table->unsignedBigInteger('value');
@@ -22,6 +22,7 @@ return new class extends Migration
             $table->dateTime('expiration_date_time');
             $table->unique(['key', 'event_id']);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

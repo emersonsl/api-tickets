@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('post_code');
             $table->string('complement')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

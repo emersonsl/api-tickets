@@ -15,14 +15,15 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('event_id');
             $table->unsignedBigInteger('sector_id');
-            $table->foreign('event_id')->references('id')->on('events');
-            $table->foreign('sector_id')->references('id')->on('sectors');
+            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
+            $table->foreign('sector_id')->references('id')->on('sectors')->onDelete('cascade');
             $table->string('title');
             $table->bigInteger('quantity');
             $table->unsignedBigInteger('value');
             $table->dateTime('release_date_time');
             $table->dateTime('expiration_date_time');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

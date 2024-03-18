@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('address_id');
             $table->unsignedBigInteger('create_by');
-            $table->foreign('address_id')->references('id')->on('addresses');
-            $table->foreign('create_by')->references('id')->on('users');
+            $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
+            $table->foreign('create_by')->references('id')->on('users')->onDelete('restrict');
             $table->string('title');
             $table->dateTime('date_time');
             $table->string('banner_url')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('ticket_id');
-            $table->foreign('ticket_id')->references('id')->on('tickets');
+            $table->foreign('ticket_id')->references('id')->on('tickets')->onDelete('restrict');
             $table->unsignedBigInteger('amount');
             $table->integer('status');
             $table->string('description');
@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string('reference_id')->nullable();
             $table->string('payment')->nullable();
             $table->dateTime('expiration_at')->nullable();
-
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
