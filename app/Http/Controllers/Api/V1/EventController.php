@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -230,4 +231,17 @@ class EventController extends Controller
 
         return $this->success('Event updated with success', 200, ['event' => new EventResource($event)]);
     }
+
+    public function destroy(Event $event){
+        try{
+            $event->forceDelete();
+            return $this->success('Event deleted with success', 200, ['event' => new EventResource($event)]);
+        }catch(QueryException $ex){
+            $event = Event::find($event->id);
+            $event->delete();
+            return $this->success('Event canceled with success, there are associated tickets', 200, ['event' => new EventResource($event)]);
+        }catch(Exception $ex){
+            return $this->error('Fails in db remove', 500, ['exception' => $ex->getMessage()], [$event]);
+        }
+    }   
 }
