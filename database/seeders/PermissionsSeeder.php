@@ -34,6 +34,7 @@ class PermissionsSeeder extends Seeder
         
         $permissions = [
             'create event',
+            'update event',
             'upload banner event',
             'list events',
             'create sector',
