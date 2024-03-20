@@ -38,7 +38,10 @@ class PermissionsSeeder extends Seeder
             'delete event',
             'upload banner event',
             'list events',
+            'list sectors',
             'create sector',
+            'update sector',
+            'delete sector',
             'create batch',
             'create coupon',
         ];

@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BatchController;
 use App\Http\Controllers\Api\V1\CouponController;
-use App\Http\Controllers\Api\V1\TestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\EventController;
@@ -42,7 +41,10 @@ Route::prefix('v1')->group(function(){
         Route::get('/available', [EventController::class, 'listAvailable']);
     });
     Route::prefix('sector')->group(function(){
+        Route::get('/', [SectorController::class, 'index'])->middleware(['auth:sanctum', 'can:list sectors']);
         Route::post('/create', [SectorController::class, 'create'])->middleware(['auth:sanctum', 'can:create sector']);
+        Route::put('/update', [SectorController::class, 'update'])->middleware(['auth:sanctum', 'can:update sector']);
+        Route::delete('/delete/{sector}', [SectorController::class, 'destroy'])->middleware(['auth:sanctum', 'can:delete sector']);
     });
     Route::prefix('batch')->group(function(){
         Route::post('/create', [BatchController::class, 'create'])->middleware(['auth:sanctum', 'can:create batch']);
