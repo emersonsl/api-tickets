@@ -4,6 +4,7 @@ namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\Address;
 use App\Models\Event;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -204,5 +205,124 @@ class EventControllerTest extends TestCase
         $this->assertEquals('200', $responseArray['status']); 
         $this->assertEquals('Banner upload with success', $responseArray['message']);
     }
+
+    /**
+     * Test update event invalid fields
+     */
+    public function test_update_invalid_data(): void
+    {
+        $response = $this->put('/api/v1/event/update', []);
+
+        $response->assertStatus(422);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('422', $responseArray['status']); 
+        $this->assertEquals('Invalid data', $responseArray['message']); 
+    }
+
+    /**
+     * Test update event invalid fields
+     */
+    public function test_update_invalid_data_1(): void
+    {
+        $response = $this->put('/api/v1/event/update', [ 
+            'address' => [
+                'number' => 'invalid type'
+            ],
+            'event' => [
+                'date_time' => 'invalid type'
+            ]
+        ]);
+
+        $response->assertStatus(422);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('422', $responseArray['status']); 
+        $this->assertEquals('Invalid data', $responseArray['message']); 
+    }
+
+    /**
+     * Test update event not found
+     */
+    public function test_update_event_not_found(): void
+    {
+        $maxId = Event::max('id');
+        
+        $response = $this->put('/api/v1/event/update', [ 
+            'address' => [
+                'number' => '50'
+            ],'event' => [
+                'id' => $maxId + 1
+            ]
+        ]);
+
+        $response->assertStatus(404);
+        
+        $responseArray = $response->getData(true);
+        
+        $this->assertEquals('404', $responseArray['status']); 
+        $this->assertEquals('Event not found', $responseArray['message']);
+    }
+
+    /**
+     * Test update event success
+     */
+    public function test_update_success(): void
+    {
+        $event = Event::factory()->create();
+
+        $response = $this->put('/api/v1/event/update', [ 
+            'address' => [
+                'number' => '50'
+            ],'event' => [
+                'id' => $event->id
+            ]
+        ]);
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('Event updated with success', $responseArray['message']); 
+    }
+
+    /**
+     * Test event event success force delete
+     */
+    public function test_delete_success_force_delete(): void
+    {
+        $event = Event::factory()->create();
+
+        $response = $this->delete("/api/v1/event/delete/$event->id");
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('Event deleted with success', $responseArray['message']); 
+    }
+
+    /**
+     * Test event event success force delete
+     */
+    public function test_delete_success_soft_delete(): void
+    {
+        $result = Ticket::join('batches', 'tickets.batch_id', 'batches.id')->first();
+        $id = $result->event_id;
+
+        $response = $this->delete("/api/v1/event/delete/$id");
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('Event canceled with success, there are associated tickets', $responseArray['message']); 
+    }
+
 
 }
