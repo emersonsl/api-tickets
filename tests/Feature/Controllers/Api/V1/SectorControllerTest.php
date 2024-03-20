@@ -3,9 +3,9 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\Event;
+use App\Models\Sector;
+use App\Models\Ticket;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -20,6 +20,22 @@ class SectorControllerTest extends TestCase
         Sanctum::actingAs($user);
     }
     
+    /**
+     * Test list sectors success
+     */
+
+     public function test_list_sector_successs(): void
+     {
+        $response = $this->get('/api/v1/sector');
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('List of Sectors', $responseArray['message']); 
+     }
+
     /**
      * Test create sector invalid fields
      */
@@ -79,5 +95,95 @@ class SectorControllerTest extends TestCase
         
         $this->assertEquals('200', $responseArray['status']); 
         $this->assertEquals('Sector created with success', $responseArray['message']);
+    }
+
+    /**
+     * Test update sector invalid fields
+     */
+    public function test_update_invalid_data(): void
+    {
+        $response = $this->put('/api/v1/sector/update', []);
+
+        $response->assertStatus(422);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('422', $responseArray['status']); 
+        $this->assertEquals('Invalid data', $responseArray['message']); 
+    }
+
+    /**
+     * Test update sector not found
+     */
+    public function test_update_not_found(): void
+    {
+        $maxId = Sector::max('id');
+
+        $response = $this->put('/api/v1/sector/update', [
+            'id' => $maxId + 1,
+            'title' => fake()->word()
+        ]);
+
+        $response->assertStatus(404);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('404', $responseArray['status']); 
+        $this->assertEquals('Sector not found', $responseArray['message']); 
+    }
+
+    /**
+     * Test update sector success
+     */
+    public function test_update_success(): void
+    {
+        $id = Sector::first()->id;
+
+        $response = $this->put('/api/v1/sector/update', [
+            'id' => $id,
+            'title' => fake()->word()
+        ]);
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('Sector updated with success', $responseArray['message']); 
+    }
+
+    /**
+     * Test sector success force delete
+     */
+    public function test_delete_success_force_delete(): void
+    {
+        $sector = Sector::factory()->create();
+
+        $response = $this->delete("/api/v1/sector/delete/$sector->id");
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('Sector deleted with success', $responseArray['message']); 
+    }
+
+    /**
+     * Test sector success force delete
+     */
+    public function test_delete_success_soft_delete(): void
+    {
+        $result = Ticket::join('batches', 'tickets.batch_id', 'batches.id')->first();
+        $id = $result->sector_id;
+
+        $response = $this->delete("/api/v1/sector/delete/$id");
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('Sector canceled with success, there are associated tickets', $responseArray['message']); 
     }
 }
