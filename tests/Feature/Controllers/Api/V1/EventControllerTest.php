@@ -23,6 +23,22 @@ class EventControllerTest extends TestCase
         $user->assignRole('promoter');
         Sanctum::actingAs($user);
     }
+
+    /**
+     * Test list event success
+     */
+
+     public function test_list_event_successs(): void
+     {
+        $response = $this->get('/api/v1/event');
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('List of Events', $responseArray['message']); 
+     }
     
     /**
      * Test create event invalid fields
