@@ -4,16 +4,24 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BatchResource;
 use App\Models\Batch;
 use App\Models\Event;
 use App\Models\Sector;
 use App\Traits\HttpResponses;
 use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
 
 class BatchController extends Controller
 {
     use HttpResponses;
+
+    public function index(){
+        $data = BatchResource::collection(Batch::all());
+        
+        return $this->success('List of Batches', 200, ['batches' => $data]);
+    }
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
@@ -48,6 +56,19 @@ class BatchController extends Controller
             return $this->error('Error in stored db', 500, ['exception' => $ex->getMessage()], $request->all());
         }
 
-        return $this->success('Batch created with sucesss', 200, ['batch' => $batch]);
+        return $this->success('Batch created with sucesss', 200, ['batch' => new BatchResource($batch)]);
     }
+
+    public function destroy(Batch $batch){
+        try{
+            $batch->forceDelete();
+            return $this->success('Batch deleted with success', 200, ['batch' => new BatchResource($batch)]);
+        }catch(QueryException $ex){
+            $batch = Batch::find($batch->id);
+            $batch->delete();
+            return $this->success('Batch canceled with success, there are associated tickets', 200, ['batch' => new BatchResource($batch)]);
+        }catch(Exception $ex){
+            return $this->error('Fails in db remove', 500, ['exception' => $ex->getMessage()], [$batch]);
+        }
+    }  
 }

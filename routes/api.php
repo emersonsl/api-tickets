@@ -47,7 +47,9 @@ Route::prefix('v1')->group(function(){
         Route::delete('/delete/{sector}', [SectorController::class, 'destroy'])->middleware(['auth:sanctum', 'can:delete sector']);
     });
     Route::prefix('batch')->group(function(){
+        Route::get('/', [BatchController::class, 'index'])->middleware(['auth:sanctum', 'can:list batches']);
         Route::post('/create', [BatchController::class, 'create'])->middleware(['auth:sanctum', 'can:create batch']);
+        Route::delete('/delete/{batch}', [BatchController::class, 'destroy'])->middleware(['auth:sanctum', 'can:delete batch']);
     });
     Route::prefix('coupon')->group(function(){
         Route::get('/', [CouponController::class, 'index'])->middleware(['auth:sanctum', 'can:list coupons']);
