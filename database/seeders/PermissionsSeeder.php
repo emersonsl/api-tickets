@@ -43,7 +43,9 @@ class PermissionsSeeder extends Seeder
             'update sector',
             'delete sector',
             'create batch',
+            'list coupons',
             'create coupon',
+            'delete coupon',
         ];
         $this->createAddPermissions($promoteRole, $permissions);
         return $promoteRole;

@@ -3,18 +3,26 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CouponResource;
 use App\Models\Coupon;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Traits\HttpResponses;
 use Brick\Math\BigInteger;
 use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Type\Integer;
 
 class CouponController extends Controller
 {
     use HttpResponses;
+
+    public function index(){
+        $data = CouponResource::collection(Coupon::all());
+        
+        return $this->success('List of Coupons', 200, ['coupons' => $data]);
+    }
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
@@ -42,7 +50,7 @@ class CouponController extends Controller
             return $this->error('Fails in db store', 500, ['exception' => $ex->getMessage()], $request->all());
         }
         
-        return $this->success('Coupon created with success', 200, ['sector' => $coupon]);
+        return $this->success('Coupon created with success', 200, ['sector' => new CouponResource($coupon)]);
     }
 
     public static function check(string $key, int $event_id, float $value_batch = null): array{
@@ -69,5 +77,18 @@ class CouponController extends Controller
         }
         
         return ['success' => true, 'coupon' => $coupon];
+    }
+
+    public function destroy(Coupon $coupon){
+        try{
+            $coupon->forceDelete();
+            return $this->success('Coupon deleted with success', 200, ['coupon' => new CouponResource($coupon)]);
+        }catch(QueryException $ex){
+            $coupon = Coupon::find($coupon->id);
+            $coupon->delete();
+            return $this->success('Coupon canceled with success, there are associated tickets', 200, ['coupon' => new CouponResource($coupon)]);
+        }catch(Exception $ex){
+            return $this->error('Fails in db remove', 500, ['exception' => $ex->getMessage()], [$coupon]);
+        }
     }
 }

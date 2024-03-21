@@ -50,7 +50,9 @@ Route::prefix('v1')->group(function(){
         Route::post('/create', [BatchController::class, 'create'])->middleware(['auth:sanctum', 'can:create batch']);
     });
     Route::prefix('coupon')->group(function(){
+        Route::get('/', [CouponController::class, 'index'])->middleware(['auth:sanctum', 'can:list coupons']);
         Route::post('/create', [CouponController::class, 'create'])->middleware(['auth:sanctum', 'can:create coupon']);
+        Route::delete('/delete/{coupon}', [CouponController::class, 'destroy'])->middleware(['auth:sanctum', 'can:delete coupon']);
     });
     Route::prefix('ticket')->group(function(){
         Route::post('/reserve', [TicketController::class, 'create'])->middleware(['auth:sanctum', 'can:reserve ticket']);
