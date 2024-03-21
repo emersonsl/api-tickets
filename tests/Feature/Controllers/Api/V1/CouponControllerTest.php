@@ -5,6 +5,7 @@ namespace Tests\Feature\Controllers\Api\V1;
 use App\Http\Controllers\Api\V1\CouponController;
 use App\Models\Coupon;
 use App\Models\Event;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -21,6 +22,22 @@ class CouponControllerTest extends TestCase
         $user->assignRole('promoter');
         Sanctum::actingAs($user);
     }
+
+    /**
+     * Test list coupon success
+     */
+
+     public function test_list_successs(): void
+     {
+        $response = $this->get('/api/v1/coupon');
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('List of Coupons', $responseArray['message']); 
+     }
     
     /**
      * Test create batch invalid fields
@@ -163,4 +180,38 @@ class CouponControllerTest extends TestCase
         $this->assertEquals($coupon->id, $response['coupon']->id);
     }
 
+    /**
+     * Test coupon success force delete
+     */
+    public function test_delete_success_force_delete(): void
+    {
+        $coupon = Coupon::factory()->create();
+
+        $response = $this->delete("/api/v1/coupon/delete/$coupon->id");
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('Coupon deleted with success', $responseArray['message']); 
+    }
+
+    /**
+     * Test event event success force delete
+     */
+    public function test_delete_success_soft_delete(): void
+    {
+        $result = Ticket::join('batches', 'tickets.batch_id', 'batches.id')->whereNotNull('tickets.coupon_id')->get()->first();
+        $id = $result->coupon_id;
+
+        $response = $this->delete("/api/v1/coupon/delete/$id");
+
+        $response->assertStatus(200);
+        
+        $responseArray = $response->getData(true);
+
+        $this->assertEquals('200', $responseArray['status']); 
+        $this->assertEquals('Coupon canceled with success, there are associated tickets', $responseArray['message']); 
+    }   
 }
