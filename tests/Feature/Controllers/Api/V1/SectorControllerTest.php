@@ -102,7 +102,9 @@ class SectorControllerTest extends TestCase
      */
     public function test_update_invalid_data(): void
     {
-        $response = $this->put('/api/v1/sector/update', []);
+        $id = Sector::first()->id;
+
+        $response = $this->put("/api/v1/sector/update/$id", []);
 
         $response->assertStatus(422);
         
@@ -118,18 +120,13 @@ class SectorControllerTest extends TestCase
     public function test_update_not_found(): void
     {
         $maxId = Sector::max('id');
+        $id = $maxId + 1;
 
-        $response = $this->put('/api/v1/sector/update', [
-            'id' => $maxId + 1,
+        $response = $this->put("/api/v1/sector/update/$id", [
             'title' => fake()->word()
         ]);
 
         $response->assertStatus(404);
-        
-        $responseArray = $response->getData(true);
-
-        $this->assertEquals('404', $responseArray['status']); 
-        $this->assertEquals('Sector not found', $responseArray['message']); 
     }
 
     /**
@@ -139,7 +136,7 @@ class SectorControllerTest extends TestCase
     {
         $id = Sector::first()->id;
 
-        $response = $this->put('/api/v1/sector/update', [
+        $response = $this->put("/api/v1/sector/update/$id", [
             'id' => $id,
             'title' => fake()->word()
         ]);

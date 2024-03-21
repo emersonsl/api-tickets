@@ -28,8 +28,6 @@ class SectorController extends Controller
 
         if($create){
             $fields['event_id'] = 'required|numeric|integer|min:1';
-        }else{
-            $fields['id'] = 'required|numeric|integer|min:1';
         }
 
         return Validator::make($request->all(), $fields);
@@ -57,17 +55,11 @@ class SectorController extends Controller
         return $this->success('Sector created with success', 200, ['sector' => $sector]);
     }
 
-    public function update(Request $request){
+    public function update(Request $request, Sector $sector){
         $validator = $this->makeValidator($request, false);
         
         if($validator->fails()){
             return $this->error('Invalid data', 422, $validator->errors(), $request->all());
-        }
-
-        $sector = Sector::find($request->get('id'));
-
-        if(!$sector){
-            return $this->error('Sector not found', 404, [], $request->all());
         }
 
         try{

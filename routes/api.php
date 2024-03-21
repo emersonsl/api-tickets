@@ -43,7 +43,7 @@ Route::prefix('v1')->group(function(){
     Route::prefix('sector')->group(function(){
         Route::get('/', [SectorController::class, 'index'])->middleware(['auth:sanctum', 'can:list sectors']);
         Route::post('/create', [SectorController::class, 'create'])->middleware(['auth:sanctum', 'can:create sector']);
-        Route::put('/update', [SectorController::class, 'update'])->middleware(['auth:sanctum', 'can:update sector']);
+        Route::put('/update/{sector}', [SectorController::class, 'update'])->middleware(['auth:sanctum', 'can:update sector']);
         Route::delete('/delete/{sector}', [SectorController::class, 'destroy'])->middleware(['auth:sanctum', 'can:delete sector']);
     });
     Route::prefix('batch')->group(function(){
