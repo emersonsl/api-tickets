@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SectorResource;
 use App\Models\Event;
 use App\Models\Sector;
 use App\Traits\HttpResponses;
@@ -16,9 +17,9 @@ class SectorController extends Controller
     use HttpResponses;
 
     public function index(){
-        $sectors = Sector::all();
+        $data = SectorResource::collection(Sector::all());
 
-        return $this->success('List of Sectors', 200, ['sectors' => $sectors]);
+        return $this->success('List of Sectors', 200, ['sectors' => $data]);
     }
 
     private function makeValidator(Request $request, bool $create = true){
@@ -52,7 +53,7 @@ class SectorController extends Controller
             return $this->error('Fails in db store', 500, ['exception' => $ex->getMessage()], $request->all());
         }
         
-        return $this->success('Sector created with success', 200, ['sector' => $sector]);
+        return $this->success('Sector created with success', 200, ['sector' => new SectorResource($sector)]);
     }
 
     public function update(Request $request, Sector $sector){
@@ -68,17 +69,17 @@ class SectorController extends Controller
             return $this->error('Fails in db store', 500, ['exception' => $ex->getMessage()], $request->all());
         }
 
-        return $this->success('Sector updated with success', 200, ['sector' => $sector]);
+        return $this->success('Sector updated with success', 200, ['sector' => new SectorResource($sector)]);
     }
 
     public function destroy(Sector $sector){
         try{
             $sector->forceDelete();
-            return $this->success('Sector deleted with success', 200, ['event' => $sector]);
+            return $this->success('Sector deleted with success', 200, ['event' => new SectorResource($sector)]);
         }catch(QueryException $ex){
-            $sector = Event::find($sector->id);
+            $sector = Sector::find($sector->id);
             $sector->delete();
-            return $this->success('Sector canceled with success, there are associated tickets', 200, ['sector' => $sector]);
+            return $this->success('Sector canceled with success, there are associated tickets', 200, ['sector' => new SectorResource($sector)]);
         }catch(Exception $ex){
             return $this->error('Fails in db remove', 500, ['exception' => $ex->getMessage()], [$sector]);
         }
