@@ -34,7 +34,7 @@ Route::prefix('v1')->group(function(){
     Route::prefix('event')->group(function(){
         Route::get('/', [EventController::class, 'index'])->middleware(['auth:sanctum', 'can:list events']);
         Route::post('/create', [EventController::class, 'create'])->middleware(['auth:sanctum', 'can:create event']);
-        Route::put('/update', [EventController::class, 'update'])->middleware(['auth:sanctum', 'can:update event']);
+        Route::put('/update/{event}', [EventController::class, 'update'])->middleware(['auth:sanctum', 'can:update event']);
         Route::delete('/delete/{event}', [EventController::class, 'destroy'])->middleware(['auth:sanctum', 'can:delete event']);
         Route::post('/uploadbanner', [EventController::class, 'uploadBanner'])->middleware(['auth:sanctum', 'can:upload banner event']);
         Route::get('/upcoming', [EventController::class, 'listUpcoming']);

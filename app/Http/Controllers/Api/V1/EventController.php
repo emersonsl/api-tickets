@@ -30,7 +30,7 @@ class EventController extends Controller
     private function makeValidator(Request &$request, bool $create = true){
         return Validator::make($request->all(), [
             'address' => $create ? 'required' : 'nullable',
-            'event' => 'required'
+            'event' => $create ? 'required' : 'nullable'
         ]);
     }
 
@@ -50,12 +50,8 @@ class EventController extends Controller
     private function makeValidatorEvent(Request &$request, bool $create = true){
         $fields = [
             'title' => $create ? 'required' : 'nullable',
-            'date_time' => $create ? 'required|date|after:' . date('Y-m-d H:m:s') : 'nullable'
+            'date_time' => $create ? 'required|date|after:' . date('Y-m-d H:m:s') : 'date|after:' . date('Y-m-d H:m:s')
         ];
-
-        if(!$create){
-            $fields['id'] = 'required';
-        }
 
         return Validator::make($request->get('event'), $fields);
     }
@@ -189,42 +185,34 @@ class EventController extends Controller
         return $this->success('Banner upload with success', 200, ['event' => $event]);
     }
 
-    public function update(Request $request){
-        $validator = $this->makeValidator($request, false);
-        
-        if($validator->fails()){
-            return $this->error('Invalid data', 422, $validator->errors(), $request->all());
-        }
-
+    public function update(Request $request, Event $event){
         $errors = [];
+        
         if($request->get('address')){
             $validatorAddress = $this->makeValidatorAddress($request, false);
             if($validatorAddress->fails()){
                 $errors['address'] = $validatorAddress->errors();
             }
         }
-        
-        $validatorEvent = $this->makeValidatorEvent($request, false);
-        
-        if($validatorEvent->fails()){
-            $errors['event'] = $validatorEvent->errors();
+
+        if($request->get('event')){
+            $validatorEvent = $this->makeValidatorEvent($request, false);
+            if($validatorEvent->fails()){
+                $errors['event'] = $validatorEvent->errors();
+            }
         }
         
         if(!empty($errors)){
             return $this->error('Invalid data', 422, $errors); 
-        }
-        
-        $event = Event::find($request->get('event')['id']);
-
-        if(!$event){
-            return $this->error('Event not found', 404, [], $request->all());
         }
 
         try{
             if($request->get('address')){
                 Address::find($event->address_id)->update($validatorAddress->validated());
             }
-            $event->update($validatorEvent->validated());
+            if($request->get('event')){
+                $event->update($validatorEvent->validated());
+            }
         }catch (Exception $ex){
             return $this->error('Fails in db store', 500, ['exception' => $ex->getMessage()], $request->all());
         }

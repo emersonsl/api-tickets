@@ -227,22 +227,9 @@ class EventControllerTest extends TestCase
      */
     public function test_update_invalid_data(): void
     {
-        $response = $this->put('/api/v1/event/update', []);
+        $id = Event::first()->id;
 
-        $response->assertStatus(422);
-        
-        $responseArray = $response->getData(true);
-
-        $this->assertEquals('422', $responseArray['status']); 
-        $this->assertEquals('Invalid data', $responseArray['message']); 
-    }
-
-    /**
-     * Test update event invalid fields
-     */
-    public function test_update_invalid_data_1(): void
-    {
-        $response = $this->put('/api/v1/event/update', [ 
+        $response = $this->put("/api/v1/event/update/$id", [ 
             'address' => [
                 'number' => 'invalid type'
             ],
@@ -265,21 +252,15 @@ class EventControllerTest extends TestCase
     public function test_update_event_not_found(): void
     {
         $maxId = Event::max('id');
+        $id = $maxId + 1;
         
-        $response = $this->put('/api/v1/event/update', [ 
+        $response = $this->put("/api/v1/event/update/$id", [ 
             'address' => [
                 'number' => '50'
-            ],'event' => [
-                'id' => $maxId + 1
             ]
         ]);
 
         $response->assertStatus(404);
-        
-        $responseArray = $response->getData(true);
-        
-        $this->assertEquals('404', $responseArray['status']); 
-        $this->assertEquals('Event not found', $responseArray['message']);
     }
 
     /**
@@ -289,11 +270,9 @@ class EventControllerTest extends TestCase
     {
         $event = Event::factory()->create();
 
-        $response = $this->put('/api/v1/event/update', [ 
+        $response = $this->put("/api/v1/event/update/$event->id", [ 
             'address' => [
                 'number' => '50'
-            ],'event' => [
-                'id' => $event->id
             ]
         ]);
 
