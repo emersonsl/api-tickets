@@ -24,6 +24,7 @@ class PermissionsSeeder extends Seeder
         
         $permissions = [
             'promote users',
+            'list tickets',
         ];
         $this->createAddPermissions($adminRole, $permissions);
         return $adminRole;

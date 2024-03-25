@@ -57,6 +57,7 @@ Route::prefix('v1')->group(function(){
         Route::delete('/delete/{coupon}', [CouponController::class, 'destroy'])->middleware(['auth:sanctum', 'can:delete coupon']);
     });
     Route::prefix('ticket')->group(function(){
+        Route::get('/', [TicketController::class, 'index'])->middleware(['auth:sanctum', 'can:list tickets']);
         Route::post('/reserve', [TicketController::class, 'create'])->middleware(['auth:sanctum', 'can:reserve ticket']);
     });
     Route::prefix('payment')->group(function(){

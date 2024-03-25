@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TicketResource;
 use App\Models\Batch;
 use App\Models\Coupon;
 use App\Models\Ticket;
@@ -18,6 +19,12 @@ use Illuminate\Http\Request;
 class TicketController extends Controller
 {
     use HttpResponses;
+
+    public function index(){
+        $data = TicketResource::collection(Ticket::all());
+        
+        return $this->success('List of Batches', 200, ['batches' => $data]);
+    }
 
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
