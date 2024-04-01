@@ -35,13 +35,15 @@ class WebHookController extends Controller
         }
 
         $requestAmount = $request->get('amount');
-        $paymentAmount = $payment->amount;
-        $status = $this->getPaymentStatus($paymentAmount, $requestAmount);
-
-        $payment->update([
-            'status' => $status,
-            'paid_at' => $request->get('paid_at'),
-        ]);
+        if($request->get('status') <= 1){
+            $paymentAmount = $payment->amount;
+            $status = $this->getPaymentStatus($paymentAmount, $requestAmount);
+    
+            $payment->update([
+                'status' => $status,
+                'paid_at' => $request->get('paid_at'),
+            ]);
+        } 
         WebHook::create([
             'model_id' => $external_id,
             'model' => 'payment',

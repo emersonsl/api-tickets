@@ -105,21 +105,20 @@ class TicketController extends Controller
         if(!$user->hasRole('admin') && $ticket->user_id != $user->id){
             return $this->error('This action is unauthorized. Only the owner or admin can cancel a ticket', 403, []);
         }
-
-        //cancelar o pagamento, devolver valor
+        
         $payment = Payment::where('ticket_id', $ticket->id)->where('status', Constants::PAYMENT_STATUS_PAID)->orderBy('created_at', 'desc')->get()->first();
-
-        if($payment){
-            CancelPayment::dispatch($payment);
-        }else{
-            $result = $this->cancelTicket($ticket);
-
-            if($result['success']){
-                //enviar e-mail para dono informando o cancelamento
-                return $this->success('Ticket canceled with success', 200, ['event' => new TicketResource($ticket)]);
+        
+        $result = $this->cancelTicket($ticket);
+        
+        if($result['success']){
+            if($payment){
+                CancelPayment::dispatch($payment);
+                return $this->success('Ticket canceled with success, payment cashout in processing', 200, ['event' => new TicketResource($ticket)]);
             }else{
-                return $this->error('Fails in db remove', 500, ['exception' => $result['message']], [$ticket]);
-            }
+                return $this->success('Ticket canceled with success', 200, ['event' => new TicketResource($ticket)]);
+            }    
+        }else{
+            return $this->error('Fails in db remove', 500, ['exception' => $result['message']], [$ticket]);
         }
     }
 
