@@ -13,6 +13,7 @@ define('PAGGUE_CLIENT_SECRET', env('PAGGUE_CLIENT_SECRET'));
 define('PAGGUE_SIGNATURE', env('PAGGUE_SIGNATURE'));
 define('PAGGUE_END_POINT_AUTH', env('PAGGUE_END_POINT_AUTH'));
 define('PAGGUE_END_POINT_BILLING', env('PAGGUE_END_POINT_BILLING'));
+define('PAGGUE_END_POINT_CASHBACK', env('PAGGUE_END_POINT_CASHBACK'));
 
 trait Paggue
 {
@@ -62,5 +63,37 @@ trait Paggue
         return ['success' => true, 'data' => $responseBodyCreatePix];
     }
 
+    public function sendRequestCashback(string $hash, string $token, string $company_id){
+        $url = PAGGUE_END_POINT_CASHBACK . "/$hash";
+
+        $response = Http::withToken($token)->withHeaders([
+            'X-Company-ID' => $company_id,
+            'Signature' => PAGGUE_SIGNATURE
+        ])->patch($url);
+
+        return $response->json();
+    }
+
+    public function cashback(Payment $payment){
+        $responseBodyAuth = $this->authenticate();
+
+        if(isset($responseBodyAuth['error']) && $responseBodyAuth['error']){
+            $message = 'Error in connect API payment: ' . $responseBodyAuth['message'][0]['error'][0];
+            throw new Exception($message);
+        }
+
+        $token = $responseBodyAuth['access_token']; 
+        $company_id = $responseBodyAuth['user']['companies'][0]['id'];
+        $hash = $payment->hash;
+
+        $responseBodyCashback = $this->sendRequestCashback($hash, $token, $company_id);
+
+        if(isset($responseBodyCashback['error']) && $responseBodyCashback['error']){
+            $message = 'Error in connect API payment: ' . $responseBodyCashback['message'][0]['error'][0];
+            throw new Exception($message);
+        }
+
+        return ['success' => true, 'data' => $responseBodyCashback];
+    }
     
 }

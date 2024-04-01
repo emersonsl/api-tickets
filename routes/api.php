@@ -59,6 +59,7 @@ Route::prefix('v1')->group(function(){
     Route::prefix('ticket')->group(function(){
         Route::get('/', [TicketController::class, 'index'])->middleware(['auth:sanctum', 'can:list tickets']);
         Route::post('/reserve', [TicketController::class, 'create'])->middleware(['auth:sanctum', 'can:reserve ticket']);
+        Route::delete('/delete/{ticket}', [TicketController::class, 'destroy'])->middleware(['auth:sanctum', 'can:delete ticket']);
     });
     Route::prefix('payment')->group(function(){
         Route::post('/create', [PaymentController::class, 'create'])->middleware(['auth:sanctum', 'can:create payment']);

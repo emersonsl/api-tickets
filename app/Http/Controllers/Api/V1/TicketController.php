@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Constants;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TicketResource;
+use App\Jobs\CancelPayment;
 use App\Models\Batch;
 use App\Models\Coupon;
+use App\Models\Payment;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Traits\HttpResponses;
@@ -15,6 +18,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
 {
@@ -94,5 +98,48 @@ class TicketController extends Controller
             'amount' => $batch->value - $discount
         ];
         return $ticketData;
+    }
+
+    public function destroy(Request $request, Ticket $ticket){
+        $user = $request->user();
+        if(!$user->hasRole('admin') && $ticket->user_id != $user->id){
+            return $this->error('This action is unauthorized. Only the owner or admin can cancel a ticket', 403, []);
+        }
+
+        //cancelar o pagamento, devolver valor
+        $payment = Payment::where('ticket_id', $ticket->id)->where('status', Constants::PAYMENT_STATUS_PAID)->orderBy('created_at', 'desc')->get()->first();
+
+        if($payment){
+            CancelPayment::dispatch($payment);
+        }else{
+            $result = $this->cancelTicket($ticket);
+
+            if($result['success']){
+                //enviar e-mail para dono informando o cancelamento
+                return $this->success('Ticket canceled with success', 200, ['event' => new TicketResource($ticket)]);
+            }else{
+                return $this->error('Fails in db remove', 500, ['exception' => $result['message']], [$ticket]);
+            }
+        }
+    }
+
+    private function cancelTicket(Ticket $ticket){
+        try{
+            DB::beginTransaction();
+            
+            if($ticket->coupon_id){
+                Coupon::find($ticket->coupon_id)->increment('quantity');
+            }
+            
+            Batch::find($ticket->batch_id)->increment('quantity');
+
+            $ticket->delete();
+            
+            DB::commit();
+            return ['success' => true, 'data' => $ticket];
+        }catch(Exception $ex){
+            DB::rollBack();
+            return ['success' => false, 'message' => $ex->getMessage()]; 
+        }
     }
 }
